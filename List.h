@@ -36,6 +36,9 @@ public:
 	bool restockItems(string);
 	void readFromFile();
 	void writeToFile();
+	void searchItem(string target, int searchBy, vector<Item>& searchResult, bool& found);//function to search item by item ID/Name/Type
+	void searchItem(double min, double max, vector<Item>& searchResult, bool& found);//overloading function, function to search item by price
+	void searchItem(int min, int max, vector<Item>& searchResult, bool& found);//overloading function, function to search item by quantity
 };
 #endif
 
@@ -683,6 +686,115 @@ void List<t>::writeToFile() { // write output to item excel file
 		
 	}
 	itemFile.close(); // close the item excel file
+}
+
+template <class t>
+void List<t>::searchItem(string target, int searchBy, vector<Item>& searchResult, bool& found)
+{
+	found = false;
+	Node* pPrev=pHead;
+	Node* pTraverse=pHead;
+	Node* pTemp=new Node;
+	if (searchBy == 1) {//search item by item ID
+
+		//using probability searching algorithm
+		while (pTraverse->link != 0 && target != pTraverse->data.getItemID())
+		{
+			pPrev = pTraverse;
+			pTraverse = pTraverse->link;
+		}
+
+		if (target == pTraverse->data.getItemID())
+		{
+			found = true;
+			searchResult.push_back(pTraverse->data);
+			if (pTraverse != pHead)
+			{
+				//exchange founded item with the item immediately before it in the list
+				pTemp->data = pPrev->data;
+				pPrev->data = pTraverse->data;
+				pTraverse->data = pTemp->data;
+			}
+		}
+		else
+		{
+			found = false;
+		}
+	}
+	else if (searchBy == 2)//search item by item name
+	{
+		//using probability searching algorithm
+		while (pTraverse->link != 0 && target != pTraverse->data.getItemName())
+		{
+			pPrev = pTraverse;
+			pTraverse = pTraverse->link;
+		}
+
+		if (target == pTraverse->data.getItemName())
+		{
+			found = true;
+			searchResult.push_back(pTraverse->data);
+			if (pTraverse != pHead)
+			{
+				//exchange founded item with the item immediately before it in the list
+				pTemp->data = pPrev->data;
+				pPrev->data = pTraverse->data;
+				pTraverse->data = pTemp->data;
+			}
+		}
+		else
+		{
+			found = false;
+		}
+	}
+	else //search items by item type
+	{
+		if (target == "F" || target == "f")
+		{
+			target = "Food";
+		}
+		else if(target == "D" || target == "d")
+		{
+			target = "Drink";
+		}
+
+		for (Node* pTraverse = pHead; pTraverse != 0; pTraverse = pTraverse->link)
+		{
+			if (pTraverse->data.getItemType() == target)
+			{
+				found = true;
+				searchResult.push_back(pTraverse->data);
+			}
+		}
+	}
+}
+
+template <class t>
+void List<t>::searchItem(double min, double max, vector<Item>& searchResult, bool& found)//search items by minimum and maximum price
+{
+	found = false;
+	for (Node* pTraverse = pHead; pTraverse != 0; pTraverse = pTraverse->link)
+	{
+		if (pTraverse->data.getItemPrice() >= min && pTraverse->data.getItemPrice() <= max)
+		{
+			found = true;
+			searchResult.push_back(pTraverse->data);
+		}
+	}
+}
+
+template <class t>
+void List<t>::searchItem(int min, int max, vector<Item>& searchResult, bool& found)//search items by minimum and maximum quantity
+{
+	found = false;
+	for (Node* pTraverse = pHead; pTraverse != 0; pTraverse = pTraverse->link)
+	{
+		if (pTraverse->data.getItemQuantity() >= min && pTraverse->data.getItemQuantity() <= max)
+		{
+			found = true;
+			searchResult.push_back(pTraverse->data);
+		}
+	}
 }
 
 template <class t>
